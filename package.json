@@ -1,0 +1,45 @@
+{
+  "name": "lucky-wheel",
+  "version": "1.0.3",
+  "description": "幸运大转盘",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JDEast1029/lucky-wheel.git"
+  },
+  "keywords": [
+    "react",
+    "rollup",
+    "components"
+  ],
+  "author": "JD",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JDEast1029/lucky-wheel/issues"
+  },
+  "homepage": "https://github.com/JDEast1029/lucky-wheel#readme",
+  "files": [
+    "dist",
+    "lib"
+  ],
+  "dependencies": {
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "babel-preset-latest": "^6.24.1",
+    "rollup": "^0.53.0",
+    "rollup-plugin-babel": "^3.0.3",
+    "rollup-plugin-commonjs": "^8.2.6",
+    "rollup-plugin-node-resolve": "^3.0.0"
+  }
+}
