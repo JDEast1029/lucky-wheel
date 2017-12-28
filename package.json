@@ -1,6 +1,6 @@
 {
   "name": "lucky-wheel",
-  "version": "1.1.1",
+  "version": "1.1.4",
   "description": "幸运大转盘",
   "main": "index.js",
   "scripts": {
@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/JDEast1029/lucky-wheel#readme",
   "files": [
-    "dist",
-    "lib"
+    "dist/",
+    "lib/"
   ],
   "dependencies": {
     "prop-types": "^15.6.0",
