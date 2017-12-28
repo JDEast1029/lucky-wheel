@@ -1,13 +1,15 @@
-{ 
-	"presets": [
-		["latest", {
-		  "es2015": {
-			"modules": false
-		  }
-		}]
-	  ],
-	  "plugins": [
-			"external-helpers",
-			"transform-react-jsx"
-		]
+{
+  "presets": [
+    [
+      "latest",
+      {
+        "es2015": {
+          "modules": false
+        }
+			}
+		],
+		"react",
+		"stage-2"
+  ],
+  "plugins": ["external-helpers", "transform-react-jsx"]
 }

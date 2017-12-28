@@ -1,0 +1,21 @@
+.c-wheel-content {
+  position: relative;
+  width: 531px;
+  height: 531px; }
+  .c-wheel-content ._bg {
+    height: 531px;
+    width: 531px; }
+  .c-wheel-content ._turntable {
+    position: absolute;
+    height: 448px;
+    width: 448px;
+    top: 41.5px;
+    left: 41.5px; }
+  .c-wheel-content ._pointer {
+    width: 174px;
+    height: 228px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -110px;
+    margin-left: -87px; }
