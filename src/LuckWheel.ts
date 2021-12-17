@@ -61,18 +61,8 @@ export class LuckWheel {
 		this.stopAnimateID = requestAnimationFrame(this.speedCutAnimate.bind(this, targetDegree));
 	}
 
-	running(step: number, t: number) {
-		const degree = this.setRotateDegree(step);
-		this.targetEl.style.transform = `rotate(${degree}deg)`;
-
-		// TODO: 测试用的，后面要去掉
-		if (t - this.startTimeStamp < 6000) {
-			this.runningAnimateID = requestAnimationFrame(this.running.bind(this, step));
-		} else {
-			this.stop(90);
-		}
-
-		// this.runningAnimateID = requestAnimationFrame(this.running.bind(this, step));
+	running(step: number) {
+		this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
 	}
 
 	reset() {
@@ -81,7 +71,7 @@ export class LuckWheel {
 	}
 
 	private init() {
-		const { maxRotationalSpeed, speedUpCubicBezier, speedCutCubicBezier } = this.config;
+		const { speedUpCubicBezier, speedCutCubicBezier } = this.config;
 		const start = this.getCubicBezierType(speedUpCubicBezier);
 		const end = this.getCubicBezierType(speedCutCubicBezier);
 		this.startCubicBezier = new CubicBezier(start[0], start[1], start[2], start[3]);
@@ -134,8 +124,22 @@ export class LuckWheel {
 		} else {
 			// keep running
 			this.status = LuckWheelStatus.PENDING;
-			this.runningAnimateID = requestAnimationFrame(this.running.bind(this, maxRotationalSpeed));
+			this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, maxRotationalSpeed));
 		}
+	}
+
+	private runningAnimate(step: number, t: number) {
+		const degree = this.setRotateDegree(step);
+		this.targetEl.style.transform = `rotate(${degree}deg)`;
+
+		// TODO: 测试用的，后面要去掉
+		if (t - this.startTimeStamp < 6000) {
+			this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
+		} else {
+			this.stop(90);
+		}
+
+		// this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
 	}
 
 	private speedCutAnimate(targetDegree: number, t: number) {
