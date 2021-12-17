@@ -1,3 +1,5 @@
+/* from: https://juejin.cn/post/6988305902633746468 */
+
 type coordinate = {
 	x: number,
 	y: number

@@ -11,9 +11,8 @@ export interface ILuckWheelConfig {
 	speedUpDuration?: number,
 	// 减速时间(ms)
 	speedCutDuration?: number,
-	// 最大转速(每秒多少圈)
+	// 最大转速时每次动画移动的角度
 	maxRotationalSpeed?: number,
-	step?: number,
 	// 加速阶段的贝塞尔曲线
 	speedUpCubicBezier: string,
 	// 减速阶段的贝塞尔曲线
