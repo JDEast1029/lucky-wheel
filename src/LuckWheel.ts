@@ -1,31 +1,23 @@
 import { luckWheelConfig } from "./constants";
-import { ILuckWheelConfig, LuckWheelStatus } from "./LuckWheelTypes";
+import { DirectionType, ILuckWheelConfig, LuckWheelStatus } from "./LuckWheelTypes";
 import { CubicBezier } from './CubicBezier';
 
 export class LuckWheel {
-	// 偏移角度 ??
-	private offsetDegree = 0;
 	private config: Required<ILuckWheelConfig>;
-	private status = LuckWheelStatus.INIT;
-	// 初始的旋转角度
-	private initialRotateDegree = 0;
-	// 已经旋转的角度
-	private rotateDegree = 0;
 	private startCubicBezier!: CubicBezier;
 	private stopCubicBezier!: CubicBezier;
-	private stopBufferCubicBezier!: CubicBezier;
+	private status = LuckWheelStatus.INIT;
+	// 已经旋转的角度
+	private rotateDegree = 0;
+	private maxRotateSpeed = 0;
 	// 开始动画触发时的时间戳
-	startTimeStamp = 0;
+	private startTimeStamp = 0;
 	// 结束动画触发时的时间戳
-	stopTimeStamp = 0;
-	// 结束后触发缓冲动画时的时间戳
-	stopBufferTimeStamp = 0;
-	// 缓冲动画需要的时间
-	bufferTime = 0;
+	private stopTimeStamp = 0;
 	// 各个状态下requestAnimationFrame返回的id,用来取消回调函数
-	startAnimateID = 0;
-	runningAnimateID = 0;
-	stopAnimateID = 0;
+	private startAnimateID = 0;
+	private runningAnimateID = 0;
+	private stopAnimateID = 0;
 
 	constructor(private targetEl: HTMLElement, config?: ILuckWheelConfig) {
 		this.config = {
@@ -35,48 +27,42 @@ export class LuckWheel {
 		this.init();
 	}
 
-	start(degree?: number) {
-		if (degree) {
-			this.validateDegree(degree);
-			this.offsetDegree = degree;
-		}
-
-		this.initialRotateDegree = this.offsetDegree;
-		this.rotateDegree = this.offsetDegree;
-
+	start() {
+		this.cancelAnimate('all');
 		this.status = LuckWheelStatus.SPEED_UP;
 		this.startTimeStamp = performance.now();
-
 		this.startAnimateID = requestAnimationFrame(this.speedUpAnimate.bind(this));
 	}
-
 
 	stop(targetDegree = 0) {
 		this.validateDegree(targetDegree);
 		this.status = LuckWheelStatus.SPEED_CUT;
 
-		cancelAnimationFrame(this.runningAnimateID);
+		this.cancelAnimate('all');
 
 		this.stopTimeStamp = performance.now();
 		this.stopAnimateID = requestAnimationFrame(this.speedCutAnimate.bind(this, targetDegree));
 	}
 
 	running(step: number) {
+		this.cancelAnimate('all');
 		this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
 	}
 
 	reset() {
 		this.status = LuckWheelStatus.INIT;
-		console.log('reset');
+		this.rotateDegree = this.config.offsetDegree;
+		this.cancelAnimate('all');
 	}
 
 	private init() {
-		const { speedUpCubicBezier, speedCutCubicBezier } = this.config;
+		const { speedUpCubicBezier, speedCutCubicBezier, offsetDegree, maxRotateSpeed, direction } = this.config;
 		const start = this.getCubicBezierType(speedUpCubicBezier);
 		const end = this.getCubicBezierType(speedCutCubicBezier);
 		this.startCubicBezier = new CubicBezier(start[0], start[1], start[2], start[3]);
 		this.stopCubicBezier = new CubicBezier(end[0], end[1], end[2], end[3]);
-		this.stopBufferCubicBezier = new CubicBezier(0 ,0 ,1, 1); // 线性
+		this.rotateDegree = offsetDegree;
+		this.maxRotateSpeed = direction === DirectionType.ANTICLOCKWISE ? -maxRotateSpeed : maxRotateSpeed;
 	}
 
 	private validateDegree(degree: number) {
@@ -108,7 +94,7 @@ export class LuckWheel {
 	}
 
 	private speedUpAnimate(t: number) {
-		const { speedUpDuration, maxRotationalSpeed } = this.config;
+		const { speedUpDuration } = this.config;
 		t = t - this.startTimeStamp;
 		if (t <= speedUpDuration) {
 			// 因为cubicBezier的值为0-1
@@ -116,7 +102,7 @@ export class LuckWheel {
 			const rsPct = this.startCubicBezier.solve(tPct); // 得到当前转速与最大转速的比值
 
 			// 通过当前角速度获得当前转动的角度
-			let degree = Number((rsPct * maxRotationalSpeed).toFixed(0));
+			let degree = Number((rsPct * this.maxRotateSpeed).toFixed(0));
 			degree = this.setRotateDegree(degree);
 
 			this.targetEl.style.transform = `rotate(${degree}deg)`;
@@ -124,38 +110,56 @@ export class LuckWheel {
 		} else {
 			// keep running
 			this.status = LuckWheelStatus.PENDING;
-			this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, maxRotationalSpeed));
+			this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, this.maxRotateSpeed));
 		}
 	}
 
 	private runningAnimate(step: number, t: number) {
 		const degree = this.setRotateDegree(step);
 		this.targetEl.style.transform = `rotate(${degree}deg)`;
-
-		// TODO: 测试用的，后面要去掉
-		if (t - this.startTimeStamp < 6000) {
-			this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
-		} else {
-			this.stop(90);
-		}
-
-		// this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
+		this.runningAnimateID = requestAnimationFrame(this.runningAnimate.bind(this, step));
 	}
 
 	private speedCutAnimate(targetDegree: number, t: number) {
-		const { speedCutDuration, maxRotationalSpeed } = this.config;
+		const { speedCutDuration } = this.config;
 		t = t - this.stopTimeStamp;
 		if (t <= speedCutDuration) {
 			// 因为cubicBezier的值为0-1
 			const tPct = t / speedCutDuration; // 当前时间t与speedCutDuration的比值
 			const rsPct = this.stopCubicBezier.solve(tPct); // 得到当前转速与最大转速的比值
-
+			
 			// 通过当前角速度获得当前转动的角度
-			let degree = Number(((1 - rsPct) * maxRotationalSpeed).toFixed(0));
-			degree = this.setRotateDegree(degree);
+			let degree = Number(((1 - rsPct) * this.maxRotateSpeed).toFixed(0));
+			if (degree <= 3) {
+				requestAnimationFrame(this.stopBufferAnimate.bind(this, degree, targetDegree));
+			} else {
+				degree = this.setRotateDegree(degree);
+				this.targetEl.style.transform = `rotate(${degree}deg)`;
+				this.stopAnimateID = requestAnimationFrame(this.speedCutAnimate.bind(this, targetDegree));
+			}
+		}
+	}
 
-			this.targetEl.style.transform = `rotate(${degree}deg)`;
-			this.stopAnimateID = requestAnimationFrame(this.speedCutAnimate.bind(this, targetDegree));
-		} 
+	private stopBufferAnimate(step: number, targetDegree: number) {
+		if (this.rotateDegree === targetDegree) {
+			this.cancelAnimate([this.stopAnimateID]);
+			return;
+		}
+		const nextStep = targetDegree - this.rotateDegree;
+		if (nextStep > 0 && nextStep < step) {
+			step = nextStep;
+		}
+		const degree = this.setRotateDegree(step);
+		this.targetEl.style.transform = `rotate(${degree}deg)`;
+		this.stopAnimateID = requestAnimationFrame(this.stopBufferAnimate.bind(this, step, targetDegree));
+	}
+
+	private cancelAnimate(animateIDs: number[] | string) {
+		if (animateIDs === 'all') {
+			animateIDs = [this.startAnimateID, this.stopAnimateID, this.runningAnimateID];
+		}
+		(<number[]>animateIDs).forEach((id: number) => {
+			id && cancelAnimationFrame(id);
+		});
 	}
 }

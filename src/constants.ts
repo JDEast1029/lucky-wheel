@@ -9,9 +9,10 @@ export const cubicBezierMAP = {
 };
 export const luckWheelConfig: Required<ILuckWheelConfig> = {
 	direction: DirectionType.CLOCKWISE,
+	offsetDegree: 0,
 	speedUpDuration: 3000,
 	speedCutDuration: 3000,
-	maxRotationalSpeed: 25,
+	maxRotateSpeed: 25,
 	speedUpCubicBezier: cubicBezierMAP['linear'],
 	speedCutCubicBezier: cubicBezierMAP['linear'],
 };

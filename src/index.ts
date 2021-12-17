@@ -1,7 +1,6 @@
 import { LuckWheel } from './LuckWheel';
-import { CubicBezier } from './CubicBezier';
-import { DirectionType } from './LuckWheelTypes';
+import { DirectionType, LuckWheelStatus } from './LuckWheelTypes';
 
 
-export { DirectionType, CubicBezier };
+export { DirectionType, LuckWheelStatus };
 export default LuckWheel;
