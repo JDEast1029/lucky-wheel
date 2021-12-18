@@ -2,10 +2,10 @@
   "name": "lucky-wheel",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "dev": "npx tsc src/*.ts --outDir ./node_modules/.cache/luck-wheel --strict --lib es6,dom  --watch",
-    "build": "npx tsc src/*.ts --outDir ./lib --lib es6,dom "
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -19,9 +19,15 @@
   },
   "homepage": "https://github.com/JDEast1029/lucky-wheel#readme",
   "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "@babel/preset-typescript": "^7.16.5",
+    "@rollup/plugin-node-resolve": "^13.1.1",
     "@typescript-eslint/eslint-plugin": "^4.23.0",
     "@typescript-eslint/parser": "^4.23.0",
     "eslint": "^7.26.0",
+    "rollup": "^2.61.1",
+    "rollup-plugin-babel": "^4.4.0",
     "typescript": "^4.5.4"
   }
 }

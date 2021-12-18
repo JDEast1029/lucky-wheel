@@ -7,7 +7,7 @@ type coordinate = {
 export class CubicBezier {
 	p1: coordinate
 	p2: coordinate
-	precision = 1e-5;
+	precision = 1e-5; // 0.00001
 	constructor(x1: number, y1: number, x2: number, y2: number) {
 		this.p1 = {
 			x: x1,
